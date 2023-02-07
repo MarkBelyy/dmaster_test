@@ -8,7 +8,7 @@ export default function Calendar() {
   // moment.updateLocale('en', {week: {dow: 1}})
 
   const startDay = tempday.clone().startOf('month').startOf('week');
-
+  
  console.log(`startof: ${tempday.startOf('month').startOf('week') }`);
 
   const prevMonth = () => setTempday(prev => prev.clone().subtract(1, 'month'));

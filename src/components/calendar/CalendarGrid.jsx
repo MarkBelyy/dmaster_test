@@ -18,7 +18,7 @@ const CellWrapper = styled.div`
     min-height: 63px;
     background-color: ${props => props.isWeekend ? '#f2f2f2' : '#ffffff'};
     // ${props => props.isWeekend ? '#f2f2f2' : '#ffffff'};
-    background-color: ${props => (!(!(props.isPattern && !props.isIgnorOn) && !props.isIgnorOff)) ? '#f4d9d9' : ''};
+    background-color: ${props => (props.isPattern && !props.isIgnorOn || props.isIgnorOff) ? '#f4d9d9' : ''};
     // background-color: ${props => props.isIgnorOn ? '#ffffff' : ''};
     // background-color: ${props => props.isIgnorOff ? 'f4d9d9' : ''};
 `
@@ -41,20 +41,14 @@ const DayWrapper = styled.div`
 const CurrentDay = styled.div`
 `
 
-
 export default function CalendarGrid(props) {
 
     const [pattern, setPattern] = useState([])
     const [ignoreon, setIgnoreOn] = useState([])
     const [ignoreoff, setIgnoreOff] = useState([])
-
     const day = props.startDay.clone()
     const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
-    // console.log(`daysArray: ${daysArray}`)
     const onClickChPattern = () => {
-        let checkboxs = document.querySelectorAll('.ch-pattern');
-        console.log(checkboxs)
-
         let elems = document.querySelectorAll('.ch-pattern:checked');
         let arr = [].map.call(elems, function (obj) {
             return +obj.value;
@@ -65,9 +59,6 @@ export default function CalendarGrid(props) {
     }
 
     const onClickChIgnoreOn = () => {
-        let checkboxs = document.querySelectorAll('.ch-ignore-on');
-        console.log(checkboxs)
-
         let elems = document.querySelectorAll('.ch-ignore-on:checked');
         let arr = [].map.call(elems, function (obj) {
             return +obj.value;
@@ -77,8 +68,6 @@ export default function CalendarGrid(props) {
         console.log(`ignoreon:${ignoreon}`)
     }
     const onClickChIgnoreOff = () => {
-        let checkboxs = document.querySelectorAll('.ch-ignore-off');
-        console.log(checkboxs)
         let elems = document.querySelectorAll('.ch-ignore-off:checked');
         let arr = [].map.call(elems, function (obj) {
             return +obj.value;
@@ -90,31 +79,28 @@ export default function CalendarGrid(props) {
 
     const OnClickCell = (dayitem, day) => {
         let elems = document.querySelector('.selectignore:checked');
-        // console.log(+elems.value)
+        
         if (document.querySelector('.selectignore:checked')) {
         let selectmode = +elems.value
-        
         if (selectmode === 1) {
             console.log("Задаем паттерн")
             console.log(dayitem)
-
-            setPattern((prev) => [...prev, dayitem])
-
+            if (!pattern.includes(dayitem)) setPattern((prev) => [...prev, dayitem])
+            else setPattern(pattern.filter(x => x != dayitem))
             console.log(`pattern:${pattern}`)
         } else if (selectmode === 2) {
             console.log("Задаем рабочие")
-
-            setIgnoreOn((prev) => [...prev, day])
+            if (!ignoreon.includes(day)) setIgnoreOn((prev) => [...prev, day])
+            else setIgnoreOn(ignoreon.filter(x => x != day))
             console.log(`ignoreon:${ignoreon}`)
         } else if (selectmode === 3) {
             console.log("Задаем выходные")
-
-            setIgnoreOff((prev) => [...prev, day])
+            if (!ignoreoff.includes(day)) setIgnoreOff((prev) => [...prev, day])
+            else setIgnoreOff(ignoreoff.filter(x => x != day))
             console.log(`ignoreoff:${ignoreoff}`)
         }
     }
     }
-
 
     return (
         <div>
@@ -123,8 +109,6 @@ export default function CalendarGrid(props) {
                     daysArray.map((dayItem) => (
                         <CellWrapper onClick={() => {
                             OnClickCell(dayItem.day(), +dayItem.format('D'));
-                            // setSeletedDay(dayItem.format('D'))
-                            // getDay(dayItem.day());
                         }}
 
                             key={dayItem.format('DDMMYYYY')}

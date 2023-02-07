@@ -28,7 +28,7 @@ export default function InputBlock({ onClickChPattern, onClickChIgnoreOn, onClic
                 <button
                     onClick={onClickChPattern}
                 >Выбрать выходные</button>
-                <input name='selectignore' className='selectignore' type="radio" id="radioButton" value={1}  readOnly />
+                <input name='selectignore' className='selectignore' type="radio" id="radioButton" value={1} readOnly />
             </div>
             <div>
                 <ChWrapper>
