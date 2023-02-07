@@ -16,10 +16,11 @@ const GridWrapper = styled.div`
 const CellWrapper = styled.div`
     min-width: 40px;
     min-height: 63px;
-    background-color: #ffffff;
+    background-color: ${props => props.isWeekend ? '#f2f2f2' : '#ffffff'};
     // ${props => props.isWeekend ? '#f2f2f2' : '#ffffff'};
-    background-color: ${props => props.isPattern ? '#f4d9d9' : ''};
-    background-color: ${props => props.isIgnorOn ? '#ffffff' : ''};
+    background-color: ${props => (!(!(props.isPattern && !props.isIgnorOn) && !props.isIgnorOff)) ? '#f4d9d9' : ''};
+    // background-color: ${props => props.isIgnorOn ? '#ffffff' : ''};
+    // background-color: ${props => props.isIgnorOff ? 'f4d9d9' : ''};
 `
 const RowCell = styled.div`
     display: flex;
@@ -42,10 +43,10 @@ const CurrentDay = styled.div`
 
 
 export default function CalendarGrid(props) {
-    console.log(moment().format('D'))
-    // const [temp, setTempday] = useState(moment())
-    const [pattern, setPattern] = useState(Array(7))
-    const [ignoreon, setIgnoreOn] = useState(Array(7))
+
+    const [pattern, setPattern] = useState([])
+    const [ignoreon, setIgnoreOn] = useState([])
+    const [ignoreoff, setIgnoreOff] = useState([])
 
     const day = props.startDay.clone()
     const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
@@ -61,7 +62,6 @@ export default function CalendarGrid(props) {
         console.log(`arr: ${arr}`);
         setPattern(arr)
         console.log(`pattern:${pattern}`)
-        console.log(`pattern include: ${pattern.includes(2)}`)
     }
 
     const onClickChIgnoreOn = () => {
@@ -76,17 +76,62 @@ export default function CalendarGrid(props) {
         setIgnoreOn(arr)
         console.log(`ignoreon:${ignoreon}`)
     }
+    const onClickChIgnoreOff = () => {
+        let checkboxs = document.querySelectorAll('.ch-ignore-off');
+        console.log(checkboxs)
+        let elems = document.querySelectorAll('.ch-ignore-off:checked');
+        let arr = [].map.call(elems, function (obj) {
+            return +obj.value;
+        });
+        console.log(`arr: ${arr}`);
+        setIgnoreOff(arr)
+        console.log(`ignoreoff:${ignoreoff}`)
+    }
+
+    const OnClickCell = (dayitem, day) => {
+        let elems = document.querySelector('.selectignore:checked');
+        // console.log(+elems.value)
+        if (document.querySelector('.selectignore:checked')) {
+        let selectmode = +elems.value
+        
+        if (selectmode === 1) {
+            console.log("Задаем паттерн")
+            console.log(dayitem)
+
+            setPattern((prev) => [...prev, dayitem])
+
+            console.log(`pattern:${pattern}`)
+        } else if (selectmode === 2) {
+            console.log("Задаем рабочие")
+
+            setIgnoreOn((prev) => [...prev, day])
+            console.log(`ignoreon:${ignoreon}`)
+        } else if (selectmode === 3) {
+            console.log("Задаем выходные")
+
+            setIgnoreOff((prev) => [...prev, day])
+            console.log(`ignoreoff:${ignoreoff}`)
+        }
+    }
+    }
+
 
     return (
         <div>
             <GridWrapper>
                 {
                     daysArray.map((dayItem) => (
-                        <CellWrapper
+                        <CellWrapper onClick={() => {
+                            OnClickCell(dayItem.day(), +dayItem.format('D'));
+                            // setSeletedDay(dayItem.format('D'))
+                            // getDay(dayItem.day());
+                        }}
+
                             key={dayItem.format('DDMMYYYY')}
                             isWeekend={dayItem.day() === 6 || dayItem.day() === 0}
                             isPattern={pattern.includes(dayItem.day())}
                             isIgnorOn={ignoreon.includes(+dayItem.format('D'))}
+                            isIgnorOff={ignoreoff.includes(+dayItem.format('D'))}
                         >
                             <RowCell flexend>
                                 <DayWrapper
@@ -101,7 +146,11 @@ export default function CalendarGrid(props) {
                     ))
                 }
             </GridWrapper>
-            <InputBlock onClickChPattern={onClickChPattern} onClickChIgnoreOn={onClickChIgnoreOn} />
+            <InputBlock
+                onClickChPattern={onClickChPattern}
+                onClickChIgnoreOn={onClickChIgnoreOn}
+                onClickChIgnoreOff={onClickChIgnoreOff}
+            />
         </div>
     )
 }
