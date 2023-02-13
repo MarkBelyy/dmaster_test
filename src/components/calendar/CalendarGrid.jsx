@@ -68,25 +68,24 @@ export default function CalendarGrid(props) {
         console.log(arr)
         return arr
     }
-    useEffect(() => {
-        const selecteddays = document.querySelectorAll('.cellwrapper');
-        console.log(selecteddays);
-        selecteddays.forEach(item => {
-            item.addEventListener('click', function handleClick(event) {
-                // console.log('box clicked', event);
-                if (document.querySelector('.selectignore:checked').value == 3) {
-                    item.setAttribute('style', 'background-color: yellow;');
-                    console.log('Value 3');
-                }
-
-
-                else if (document.querySelector('.selectignore:checked').value == 4) {
-                    item.setAttribute('style', 'background-color: blue;');
-                    console.log('Value 4');
-                }
-            });
-        });
-    })
+    // const getIgonoreDays = (firstday, lastday) => {
+    //     let n = lastday.diff(firstday, 'days')
+    //     firstday.subtract(1, 'd')
+    //     let arr = [...Array(n + 1)].map(() => firstday.add(1, 'd').clone().format('D'))
+    //     console.log(arr)
+    //     return arr
+    // }
+// useEffect(() =>{
+//     const selecteddays = document.querySelectorAll('.cellwrapper');
+//     console.log(selecteddays);
+//     selecteddays.forEach(item => {
+//         item.addEventListener('click', function handleClick(event) {
+//             console.log('box clicked', event);
+//             if (document.querySelector('.selectignore:checked').value == 3) item.setAttribute('style', 'background-color: yellow;');
+//             else if (document.querySelector('.selectignore:checked').value == 4) item.setAttribute('style', 'background-color: blue;');
+//         });
+//     });
+// })
 
 
     const OnClickCell2 = (weekday, day) => {
