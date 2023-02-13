@@ -17,7 +17,7 @@ export default function Calendar() {
   }, [])
 
 
-  const startDay = tempday.clone().startOf('month').startOf('week');
+  const startDay = tempday.clone().startOf('month').startOf('week').subtract(1, 'd');
 
 
 

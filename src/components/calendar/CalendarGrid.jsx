@@ -48,7 +48,7 @@ export default function CalendarGrid(props) {
     const [ignoreoff, setIgnoreOff] = useState(0)
     const [isRed, setIsRed] = useState([])
     const day = props.startDay
-    day.subtract(1, 'd')
+    
     const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
     // useEffect(() => {
     // console.log(document.querySelector('.selectignore:checked'))
@@ -96,8 +96,6 @@ export default function CalendarGrid(props) {
             let selectmode = +elems.value
             if (selectmode === 1) {
                 console.log("Задаем паттерн")
-                setIgnoreOn(0)
-                setIgnoreOff(0)
                 let a = getPatternDays(weekday, daysArray)
                 setIsRed(prev => prev.concat(a).filter((x, i) => isRed.concat(a).indexOf(x) === i));
                 console.log(`isRed:${isRed}`)
@@ -105,14 +103,11 @@ export default function CalendarGrid(props) {
 
             } else if (selectmode === 3) {
                 console.log("Задаем рабочие")
-                setIgnoreOn(1)
-                setIgnoreOff(0)
             } else if (selectmode === 4) {
                 console.log("Задаем выходные")
 
                 console.log(`ignoreoff:${ignoreoff}`)
-                setIgnoreOn(0)
-                setIgnoreOff(1)
+
             }
         }
     }
