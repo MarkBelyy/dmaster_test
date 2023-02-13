@@ -20,6 +20,7 @@ export default function Calendar() {
   console.log(`startDay: ${startDay}, tempday: ${tempday}`);
   return (
     <div>
+      <h2>Календарь</h2>
       <Monitor
         tempday={tempday}
         prevMonth={prevMonth}
