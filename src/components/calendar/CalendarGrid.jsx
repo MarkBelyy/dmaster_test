@@ -44,29 +44,26 @@ color: ${props => !props.isThisMonth ? 'gray' : ''}
 
 export default function CalendarGrid(props) {
 
-    const [ignoreon, setIgnoreOn] = useState(0)
-    const [ignoreoff, setIgnoreOff] = useState(0)
+    // const [ignoreon, setIgnoreOn] = useState(0)
+    // const [ignoreoff, setIgnoreOff] = useState(0)
     const [isRed, setIsRed] = useState([])
-    const day = props.startDay
-    
+    const day = props.startDay.clone()
     const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
-    // useEffect(() => {
-    // console.log(document.querySelector('.selectignore:checked'))
-    // console.log(`value 3: ${document.querySelector('.selectignore:checked').value == 3}`)
-    // console.log(`value 4: ${document.querySelector('.selectignore:checked').value === 4}`)
-    // })
+
+
     const getPatternDays = (dayweek, daysArray) => {
         let arr = daysArray.filter(item => item.day() === dayweek)
         arr = arr.filter(item => item.format('M') === daysArray[20].format('M'))
         console.log(arr)
         return arr.map(x => +x)
     }
-    const getIgonoreDays = (firstday, lastday) => {
-        let n = lastday.diff(firstday, 'days')
-        firstday.subtract(1, 'd')
-        let arr = [...Array(n + 1)].map(() => firstday.clone().add(1, 'd').format('D'))
+    const getYearPatternDays = (dayweek, daysArray) => {
+        const yearday = props.startDay.clone()
+        console.log('первый день в году', yearday.endOf('year').diff(yearday.startOf('year'), 'days'))
+
+        let arr = daysArray.filter(item => item.day() === dayweek)
         console.log(arr)
-        return arr
+        return arr.map(x => +x)
     }
     // const getIgonoreDays = (firstday, lastday) => {
     //     let n = lastday.diff(firstday, 'days')
@@ -75,17 +72,17 @@ export default function CalendarGrid(props) {
     //     console.log(arr)
     //     return arr
     // }
-// useEffect(() =>{
-//     const selecteddays = document.querySelectorAll('.cellwrapper');
-//     console.log(selecteddays);
-//     selecteddays.forEach(item => {
-//         item.addEventListener('click', function handleClick(event) {
-//             console.log('box clicked', event);
-//             if (document.querySelector('.selectignore:checked').value == 3) item.setAttribute('style', 'background-color: yellow;');
-//             else if (document.querySelector('.selectignore:checked').value == 4) item.setAttribute('style', 'background-color: blue;');
-//         });
-//     });
-// })
+    useEffect(() =>{
+        const selecteddays = document.querySelectorAll('.cellwrapper');
+        console.log(selecteddays);
+        selecteddays.forEach(item => {
+            item.addEventListener('click', function handleClick(event) {
+                console.log('box clicked', event);
+                if (document.querySelector('.selectignore:checked').value == 3) item.setAttribute('style', 'background-color: yellow;');
+                else if (document.querySelector('.selectignore:checked').value == 4) item.setAttribute('style', 'background-color: blue;');
+            });
+        });
+    })
 
 
     const OnClickCell2 = (weekday, day) => {
@@ -100,12 +97,17 @@ export default function CalendarGrid(props) {
                 console.log(`isRed:${isRed}`)
 
 
+            } else if (selectmode === 2) {
+                console.log("Задаем паттерн")
+                let a = getYearPatternDays(weekday, daysArray)
+                setIsRed(prev => prev.concat(a).filter((x, i) => isRed.concat(a).indexOf(x) === i));
+                console.log(`isRed:${isRed}`)
+
+
             } else if (selectmode === 3) {
                 console.log("Задаем рабочие")
             } else if (selectmode === 4) {
                 console.log("Задаем выходные")
-
-                console.log(`ignoreoff:${ignoreoff}`)
 
             }
         }
