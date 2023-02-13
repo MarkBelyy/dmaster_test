@@ -47,10 +47,14 @@ export default function CalendarGrid(props) {
     const [ignoreon, setIgnoreOn] = useState(0)
     const [ignoreoff, setIgnoreOff] = useState(0)
     const [isRed, setIsRed] = useState([])
-    const day = props.startDay.clone()
+    const day = props.startDay
+    day.subtract(1, 'd')
     const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
-
-
+    // useEffect(() => {
+    // console.log(document.querySelector('.selectignore:checked'))
+    // console.log(`value 3: ${document.querySelector('.selectignore:checked').value == 3}`)
+    // console.log(`value 4: ${document.querySelector('.selectignore:checked').value === 4}`)
+    // })
     const getPatternDays = (dayweek, daysArray) => {
         let arr = daysArray.filter(item => item.day() === dayweek)
         arr = arr.filter(item => item.format('M') === daysArray[20].format('M'))
@@ -60,23 +64,31 @@ export default function CalendarGrid(props) {
     const getIgonoreDays = (firstday, lastday) => {
         let n = lastday.diff(firstday, 'days')
         firstday.subtract(1, 'd')
-        let arr = [...Array(n + 1)].map(() => firstday.add(1, 'd').clone().format('D'))
+        let arr = [...Array(n + 1)].map(() => firstday.clone().add(1, 'd').format('D'))
         console.log(arr)
         return arr
     }
-useEffect(() =>{
-    const selecteddays = document.querySelectorAll('.cellwrapper');
-    console.log(selecteddays);
-    selecteddays.forEach(item => {
-        item.addEventListener('click', function handleClick(event) {
-            console.log('box clicked', event);
-            if (ignoreon) item.setAttribute('style', 'background-color: yellow;');
-            else if (ignoreoff) item.setAttribute('style', 'background-color: blue;');
-        });
-    });
-}, [ignoreon, ignoreoff])
+    useEffect(() => {
+        const selecteddays = document.querySelectorAll('.cellwrapper');
+        console.log(selecteddays);
+        selecteddays.forEach(item => {
+            item.addEventListener('click', function handleClick(event) {
+                // console.log('box clicked', event);
+                if (document.querySelector('.selectignore:checked').value == 3) {
+                    item.setAttribute('style', 'background-color: yellow;');
+                    console.log('Value 3');
+                }
 
-    
+
+                else if (document.querySelector('.selectignore:checked').value == 4) {
+                    item.setAttribute('style', 'background-color: blue;');
+                    console.log('Value 4');
+                }
+            });
+        });
+    })
+
+
     const OnClickCell2 = (weekday, day) => {
         let elems = document.querySelector('.selectignore:checked');
 
@@ -89,7 +101,7 @@ useEffect(() =>{
                 let a = getPatternDays(weekday, daysArray)
                 setIsRed(prev => prev.concat(a).filter((x, i) => isRed.concat(a).indexOf(x) === i));
                 console.log(`isRed:${isRed}`)
-            
+
 
             } else if (selectmode === 3) {
                 console.log("Задаем рабочие")
@@ -97,7 +109,7 @@ useEffect(() =>{
                 setIgnoreOff(0)
             } else if (selectmode === 4) {
                 console.log("Задаем выходные")
-                
+
                 console.log(`ignoreoff:${ignoreoff}`)
                 setIgnoreOn(0)
                 setIgnoreOff(1)

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Monitor({tempday, prevMonth, nextMonth, goToday}) {
+export default function Monitor({prevMonth, nextMonth, goToday}) {
     return (
         <div>
             <button onClick={prevMonth}>Пред</button>
