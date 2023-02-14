@@ -51,12 +51,8 @@ export default function CalendarGrid(props) {
     const [endDateOff, setEndDateOff] = useState(null);
     const [ignoreOnDays, setIgnoreOnDays] = useState([])
     const [ignoreOffDays, setIgnoreOffDays] = useState([])
-    const [patternDays, setPatternDays] = useState([{
-        year: 2022,
-        month: 2,
-        day: 3
-    }])
-
+    const [patternDays, setPatternDays] = useState([])
+    const [successful, setSuccesful] = useState(false)
     const [isRed, setIsRed] = useState([])
 
     const day = props.startDay.clone()
@@ -78,35 +74,56 @@ export default function CalendarGrid(props) {
         let arr = [...Array(n + 1)].map(() => firstday.add(1, 'd').clone().format('DDMMYYYY'))
         return arr
     }
-    useEffect(() => {
-        // get data
-    },[])
+    const isObjectInArray = (arr, obj) => {
+        return arr.some(item => JSON.stringify(item) === JSON.stringify(obj));
+    }
+    // console.log(isObjectInArray(ignoreOnDays, ignoreon))
+    // useEffect(() => {
+    //     // get data
+    //     setPatternDays([...patternDays, {
+    //         year: 2023,
+    //         month: 2,
+    //         day: 3
+    //     }, {
+    //         year: 2023,
+    //         month: 13,
+    //         day: 0
+    //     }])
+
+    //     setSuccesful(true)
+    // },[])
 
 
-    useEffect(() => {
-        if (patternDays) {
-            for (let i = 0; i < patternDays.length; i++)
-                if (patternDays[i].month == 13) {
-                    let arrpy =getYearPatternDays(patternDays[i].day, daysArray)
-                    setIsRed(prev => prev.concat(arrpy).filter((x, i) => isRed.concat(arrpy).indexOf(x) === i))
-                } else if (patternDays[i].month == props.tempday.format('M')) {
-                    let arrp = getPatternDays(patternDays[i].day, daysArray)
-                    setIsRed(prev => prev.concat(arrp).filter((x, i) => isRed.concat(arrp).indexOf(x) === i))
-                }
-        } 
-    }, [props.tempday])
+    // useEffect(() => {
+    //     setIsRed([])
+    //     if (patternDays) {
+    //         console.log('+++')
+    //         for (let i = 0; i < patternDays.length; i++)
+    //             if (patternDays[i].month === 13 && patternDays[i].year === props.tempday.format('YYYY')) {
+    //                 let arrpy = getYearPatternDays(patternDays[i].day, daysArray)
+    //                 setIsRed(prev => prev.concat(arrpy).filter((x, i) => isRed.concat(arrpy).indexOf(x) === i))
+    //             } else if (patternDays[i].month === +props.tempday.format('M')) {
+    //                 let arrp = getPatternDays(patternDays[i].day, daysArray)
+    //                 setIsRed(prev => prev.concat(arrp).filter((x, i) => isRed.concat(arrp).indexOf(x) === i))
+    //             }
+    //     } 
+    // }, [props.tempday])
 
     useEffect(() => {
         if (startDateOn && endDateOn) {
             let ignoreon = {
-                startday: startDateOn.format('D'),
-                startmonth: startDateOn.format('M'),
-                startyear: startDateOn.format('YYYY'),
-                endday: endDateOn.format('D'),
-                endmonth: endDateOn.format('M'),
-                endyear: endDateOn.format('YYYY')
+                startday: +startDateOn.format('D'),
+                startmonth: +startDateOn.format('M'),
+                startyear: +startDateOn.format('YYYY'),
+                endday: +endDateOn.format('D'),
+                endmonth: +endDateOn.format('M'),
+                endyear: +endDateOn.format('YYYY')
             }
-            setIgnoreOnDays([...ignoreOnDays, ignoreon])
+            
+            console.log(!isObjectInArray(ignoreOnDays, ignoreon))
+            if (!isObjectInArray(ignoreOnDays, ignoreon)) {
+                setIgnoreOnDays([...ignoreOnDays, ignoreon])
+            }
             let arron = getIgonoreDays(startDateOn, endDateOn)
             let arr = isRed.filter(item => !arron.includes(item))
             setIsRed(arr)
@@ -117,14 +134,16 @@ export default function CalendarGrid(props) {
     useEffect(() => {
         if (startDateOff && endDateOff) {
             let ignoreoff = {
-                startday: startDateOff.format('D'),
-                startmonth: startDateOff.format('M'),
-                startyear: startDateOff.format('YYYY'),
-                endday: endDateOff.format('D'),
-                endmonth: endDateOff.format('M'),
-                endyear: endDateOff.format('YYYY')
+                startday: +startDateOff.format('D'),
+                startmonth: +startDateOff.format('M'),
+                startyear: +startDateOff.format('YYYY'),
+                endday: +endDateOff.format('D'),
+                endmonth: +endDateOff.format('M'),
+                endyear: +endDateOff.format('YYYY')
             }
-            setIgnoreOffDays([...ignoreOffDays, ignoreoff])
+            if (!isObjectInArray(ignoreOffDays, ignoreoff)) {
+                setIgnoreOffDays([...ignoreOffDays, ignoreoff])
+            }
             let arroff = getIgonoreDays(startDateOff, endDateOff)
             let arr = arroff.filter(item => !isRed.includes(item))
             setIsRed(isRed.concat(arr))
@@ -163,32 +182,38 @@ export default function CalendarGrid(props) {
                 setIsRed(prev => prev.concat(arrp).filter((x, i) => isRed.concat(arrp).indexOf(x) === i));
                 
                 let pattern = {
-                    year: props.tempday.format('YYYY'),
-                    month: props.tempday.format('M'),
-                    day: props.tempday.day()
+                    year: +props.tempday.format('YYYY'),
+                    month: +props.tempday.format('M'),
+                    day: +weekday
                 }
                 console.log(pattern)
+                console.log(!isObjectInArray(patternDays, pattern))
+                if (!isObjectInArray(patternDays, pattern)){
                 setPatternDays([...patternDays, pattern])
+                }
 
             } else if (selectmode === 2) {
                 console.log("Задаем паттерн")
                 let arryp = getYearPatternDays(weekday, daysArray)
                 setIsRed(prev => prev.concat(arryp).filter((x, i) => isRed.concat(arryp).indexOf(x) === i));
                 
-                let pattern = {
-                    year: props.tempday.format('YYYY'),
-                    month: 13,
-                    day: props.tempday.day()
+                let ypattern = {
+                    year: +props.tempday.format('YYYY'),
+                    month: +13,
+                    day: +weekday
                 }
-                console.log(pattern)
-                setPatternDays([...patternDays, pattern])
+                console.log(!isObjectInArray(patternDays, ypattern))
+                console.log(ypattern)
+                if (!isObjectInArray(patternDays, ypattern)) {
+                    setPatternDays([...patternDays, ypattern])
+                }
 
             } else if (selectmode === 3) {
                 console.log("Задаем рабочие")
                 if (!startDateOn) {
                     console.log("Первый день1:", day)
                     setStartDateOn(day);
-                } else if (startDateOff && !endDateOn) {
+                } else if (startDateOn && !endDateOn) {
                     console.log("Второй день:", day)
                     setEndDateOn(day);
                 } else {
