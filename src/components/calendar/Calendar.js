@@ -38,7 +38,7 @@ export default function Calendar() {
         nextMonth={nextMonth}
         goToday={goToday}
       />
-      <CalendarGrid startDay={startDay} />
+      <CalendarGrid startDay={startDay} tempday={tempday} />
     </div>
   )
 }
