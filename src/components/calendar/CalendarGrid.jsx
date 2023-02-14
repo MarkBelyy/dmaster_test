@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import styled from 'styled-components'
-import InputBlock from './InputBlock'
-import CalendarPattern from './CalendarPattern'
 
 
 const GridWrapper = styled.div`
@@ -43,19 +41,24 @@ const CurrentDay = styled.div`
 `
 
 
-export default function CalendarGrid(props) {
+export default function CalendarGrid(
+    {
+        tempday, startDay, isRed,
+        setIsRed, ignoreOnDays,
+        setIgnoreOnDays, ignoreOffDays,
+        setIgnoreOffDays, patternDays, 
+        setPatternDays
+    }) {
 
     const [startDateOn, setStartDateOn] = useState(null);
     const [endDateOn, setEndDateOn] = useState(null);
     const [startDateOff, setStartDateOff] = useState(null);
     const [endDateOff, setEndDateOff] = useState(null);
-    const [ignoreOnDays, setIgnoreOnDays] = useState([])
-    const [ignoreOffDays, setIgnoreOffDays] = useState([])
-    const [patternDays, setPatternDays] = useState([])
+    
     const [successful, setSuccesful] = useState(false)
-    const [isRed, setIsRed] = useState([])
 
-    const day = props.startDay.clone()
+
+    const day = startDay.clone()
     const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
 
 
@@ -119,7 +122,7 @@ export default function CalendarGrid(props) {
                 endmonth: +endDateOn.format('M'),
                 endyear: +endDateOn.format('YYYY')
             }
-            
+
             console.log(!isObjectInArray(ignoreOnDays, ignoreon))
             if (!isObjectInArray(ignoreOnDays, ignoreon)) {
                 setIgnoreOnDays([...ignoreOnDays, ignoreon])
@@ -147,7 +150,7 @@ export default function CalendarGrid(props) {
             let arroff = getIgonoreDays(startDateOff, endDateOff)
             let arr = arroff.filter(item => !isRed.includes(item))
             setIsRed(isRed.concat(arr))
-            
+
         }
     }, [startDateOff, endDateOff])
 
@@ -169,7 +172,7 @@ export default function CalendarGrid(props) {
         console.log('ignoreOffDays:')
         console.log(ignoreOffDays)
     }, [ignoreOffDays])
-    
+
 
     const OnClickCell2 = (weekday, day) => {
         let elems = document.querySelector('.selectignore:checked');
@@ -180,25 +183,25 @@ export default function CalendarGrid(props) {
                 console.log("Задаем паттерн")
                 let arrp = getPatternDays(weekday, daysArray)
                 setIsRed(prev => prev.concat(arrp).filter((x, i) => isRed.concat(arrp).indexOf(x) === i));
-                
+
                 let pattern = {
-                    year: +props.tempday.format('YYYY'),
-                    month: +props.tempday.format('M'),
+                    year: +tempday.format('YYYY'),
+                    month: +tempday.format('M'),
                     day: +weekday
                 }
                 console.log(pattern)
                 console.log(!isObjectInArray(patternDays, pattern))
-                if (!isObjectInArray(patternDays, pattern)){
-                setPatternDays([...patternDays, pattern])
+                if (!isObjectInArray(patternDays, pattern)) {
+                    setPatternDays([...patternDays, pattern])
                 }
 
             } else if (selectmode === 2) {
                 console.log("Задаем паттерн")
                 let arryp = getYearPatternDays(weekday, daysArray)
                 setIsRed(prev => prev.concat(arryp).filter((x, i) => isRed.concat(arryp).indexOf(x) === i));
-                
+
                 let ypattern = {
-                    year: +props.tempday.format('YYYY'),
+                    year: +tempday.format('YYYY'),
                     month: +13,
                     day: +weekday
                 }
@@ -240,10 +243,6 @@ export default function CalendarGrid(props) {
         }
     }
 
-    const ResetMonth = () => {
-        setIsRed([])
-        //get data
-    }
 
 
     return (
@@ -259,16 +258,13 @@ export default function CalendarGrid(props) {
                             key={dayItem.format('DDMMYYYY')}
                             isWeekend={dayItem.day() === 6 || dayItem.day() === 0}
                             isDayRed={isRed.includes(dayItem.format('DDMMYYYY'))}
-                            id={dayItem.format('DDMMYYYY')}
                         >
                             <RowCell id={dayItem.format('DDMMYYYY')} flexend>
                                 <DayWrapper
                                     isCurentDay={dayItem.format('DDMMYYYY') === moment().format('DDMMYYYY')}
-                                    id={dayItem.format('DDMMYYYY')}
                                 >
                                     <CurrentDay
                                         isThisMonth={dayItem.format('M') === daysArray[20].format('M')}
-                                        id={dayItem.format('DDMMYYYY')}
                                     >
                                         {dayItem.format('D')}
                                     </CurrentDay>
@@ -278,10 +274,8 @@ export default function CalendarGrid(props) {
                     ))
                 }
             </GridWrapper>
-            <InputBlock
-                ResetMonth={ResetMonth}
-            />
-            <CalendarPattern />
+
+
         </div>
     )
 }

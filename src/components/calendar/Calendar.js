@@ -2,8 +2,14 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import Monitor from './Monitor'
 import CalendarGrid from './CalendarGrid'
+import InputBlock from './InputBlock'
+import CalendarPattern from './CalendarPattern'
 
 export default function Calendar() {
+  const [isRed, setIsRed] = useState([])
+  const [ignoreOnDays, setIgnoreOnDays] = useState([])
+  const [ignoreOffDays, setIgnoreOffDays] = useState([])
+  const [patternDays, setPatternDays] = useState([])
   moment.updateLocale("ru", {
     week: {
       dow: 1, // First day of week is Monday
@@ -22,12 +28,16 @@ export default function Calendar() {
 
 
   console.log(`До изменений startDay: ${startDay}, tempday: ${tempday}`);
-  
+
   const prevMonth = () => {
     setTempday(tempday.subtract(1, 'month').clone())
   };
   const nextMonth = () => setTempday(tempday.add(1, 'month').clone());
   const goToday = () => setTempday(moment());
+  const ResetMonth = () => {
+    setIsRed([])
+    //get data
+  }
 
   console.log(`startDay: ${startDay}, tempday: ${tempday}`);
   return (
@@ -37,8 +47,24 @@ export default function Calendar() {
         prevMonth={prevMonth}
         nextMonth={nextMonth}
         goToday={goToday}
+        tempday={tempday}
       />
-      <CalendarGrid startDay={startDay} tempday={tempday} />
+      <CalendarGrid
+        startDay={startDay} tempday={tempday}
+        isRed={isRed} setIsRed={setIsRed}
+        ignoreOnDays={ignoreOnDays}
+        setIgnoreOnDays={setIgnoreOnDays}
+        ignoreOffDays={ignoreOffDays}
+        setIgnoreOffDays={setIgnoreOffDays}
+        patternDays={patternDays}
+        setPatternDays={setPatternDays}
+      />
+      <InputBlock
+        ResetMonth={ResetMonth}
+      />
+      <CalendarPattern
+        patternDays={patternDays}
+        setPatternDays={setPatternDays} />
     </div>
   )
 }
