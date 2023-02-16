@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
+import styled from 'styled-components'
+
 import Monitor from './Monitor'
 import CalendarGrid from './CalendarGrid'
 import InputBlock from './InputBlock'
 import CalendarPattern from './CalendarPattern'
+
+const CalendarBlock = styled.div`
+    display: flex;
+    // justify-content: space-around;
+`
+
 
 export default function Calendar() {
   const [isRed, setIsRed] = useState([])
@@ -36,36 +44,41 @@ export default function Calendar() {
   const goToday = () => setTempday(moment());
   const ResetMonth = () => {
     setIsRed([])
+    setPatternDays([])
+    setIgnoreOnDays([])
+    setIgnoreOffDays([])
     //get data
   }
 
   console.log(`startDay: ${startDay}, tempday: ${tempday}`);
   return (
-    <div>
-      <h2>Календарь</h2>
-      <Monitor
-        prevMonth={prevMonth}
-        nextMonth={nextMonth}
-        goToday={goToday}
-        tempday={tempday}
-      />
-      <CalendarGrid
-        startDay={startDay} tempday={tempday}
-        isRed={isRed} setIsRed={setIsRed}
-        ignoreOnDays={ignoreOnDays}
-        setIgnoreOnDays={setIgnoreOnDays}
-        ignoreOffDays={ignoreOffDays}
-        setIgnoreOffDays={setIgnoreOffDays}
-        patternDays={patternDays}
-        setPatternDays={setPatternDays}
-      />
-      <InputBlock
-        ResetMonth={ResetMonth}
-      />
+    <CalendarBlock>
+      <div>
+        <h2>Календарь</h2>
+        <Monitor
+          prevMonth={prevMonth}
+          nextMonth={nextMonth}
+          goToday={goToday}
+          tempday={tempday}
+        />
+        <CalendarGrid
+          startDay={startDay} tempday={tempday}
+          isRed={isRed} setIsRed={setIsRed}
+          ignoreOnDays={ignoreOnDays}
+          setIgnoreOnDays={setIgnoreOnDays}
+          ignoreOffDays={ignoreOffDays}
+          setIgnoreOffDays={setIgnoreOffDays}
+          patternDays={patternDays}
+          setPatternDays={setPatternDays}
+        />
+        <InputBlock
+          ResetMonth={ResetMonth}
+        />
+      </div>
       <CalendarPattern
         patternDays={patternDays}
         setPatternDays={setPatternDays} />
-    </div>
+    </CalendarBlock>
   )
 }
 

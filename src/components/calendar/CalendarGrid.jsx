@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
+import _ from 'lodash';
 import styled from 'styled-components'
 
 
@@ -46,7 +47,7 @@ export default function CalendarGrid(
         tempday, startDay, isRed,
         setIsRed, ignoreOnDays,
         setIgnoreOnDays, ignoreOffDays,
-        setIgnoreOffDays, patternDays, 
+        setIgnoreOffDays, patternDays,
         setPatternDays
     }) {
 
@@ -54,7 +55,7 @@ export default function CalendarGrid(
     const [endDateOn, setEndDateOn] = useState(null);
     const [startDateOff, setStartDateOff] = useState(null);
     const [endDateOff, setEndDateOff] = useState(null);
-    
+
     const [successful, setSuccesful] = useState(false)
 
 
@@ -65,6 +66,7 @@ export default function CalendarGrid(
     const getPatternDays = (dayweek, daysArray) => {
         let arr = daysArray.filter(item => item.day() === dayweek)
         arr = arr.filter(item => item.format('M') === daysArray[20].format('M'))
+       
         return arr.map(x => x.format('DDMMYYYY'))
     }
     const getYearPatternDays = (dayweek, daysArray) => {
@@ -80,46 +82,47 @@ export default function CalendarGrid(
     const isObjectInArray = (arr, obj) => {
         return arr.some(item => JSON.stringify(item) === JSON.stringify(obj));
     }
-    // console.log(isObjectInArray(ignoreOnDays, ignoreon))
-    // useEffect(() => {
-    //     // get data
-    //     setPatternDays([...patternDays, {
-    //         year: 2023,
-    //         month: 2,
-    //         day: 3
-    //     }, {
-    //         year: 2023,
-    //         month: 13,
-    //         day: 0
-    //     }])
 
-    //     setSuccesful(true)
-    // },[])
+    useEffect(() => {
+        // get data
+        setPatternDays(prevPatternDays => _.uniq(prevPatternDays.concat([...patternDays, {
+            year: 2023,
+            month: 2,
+            day: 3
+        }, {
+            year: 2023,
+            month: 13,
+            day: 4
+        }])))
+
+        setSuccesful(true)
+    }, [tempday])
 
 
-    // useEffect(() => {
-    //     setIsRed([])
-    //     if (patternDays) {
-    //         console.log('+++')
-    //         for (let i = 0; i < patternDays.length; i++)
-    //             if (patternDays[i].month === 13 && patternDays[i].year === props.tempday.format('YYYY')) {
-    //                 let arrpy = getYearPatternDays(patternDays[i].day, daysArray)
-    //                 setIsRed(prev => prev.concat(arrpy).filter((x, i) => isRed.concat(arrpy).indexOf(x) === i))
-    //             } else if (patternDays[i].month === +props.tempday.format('M')) {
-    //                 let arrp = getPatternDays(patternDays[i].day, daysArray)
-    //                 setIsRed(prev => prev.concat(arrp).filter((x, i) => isRed.concat(arrp).indexOf(x) === i))
-    //             }
-    //     } 
-    // }, [props.tempday])
+    useEffect(() => {
+        
+        if (patternDays) {
+
+            for (let i = 0; i < patternDays.length; i++) {
+                if (patternDays[i].month === 13 && patternDays[i].year === +tempday.format('YYYY')) {
+                    let arrpy = getYearPatternDays(patternDays[i].day, daysArray)
+                    setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrpy)));
+                } else if (patternDays[i].month === +tempday.format('M')) {
+                    let arrp = getPatternDays(patternDays[i].day, daysArray)
+                    setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrp)));
+                }
+            }
+        }
+    }, [tempday, successful])
 
     useEffect(() => {
         if (startDateOn && endDateOn) {
             let ignoreon = {
-                startday: +startDateOn.format('D'),
-                startmonth: +startDateOn.format('M'),
+                startday: +startDateOn.format('DD'),
+                startmonth: +startDateOn.format('MM'),
                 startyear: +startDateOn.format('YYYY'),
-                endday: +endDateOn.format('D'),
-                endmonth: +endDateOn.format('M'),
+                endday: +endDateOn.format('DD'),
+                endmonth: +endDateOn.format('MM'),
                 endyear: +endDateOn.format('YYYY')
             }
 
@@ -137,11 +140,11 @@ export default function CalendarGrid(
     useEffect(() => {
         if (startDateOff && endDateOff) {
             let ignoreoff = {
-                startday: +startDateOff.format('D'),
-                startmonth: +startDateOff.format('M'),
+                startday: +startDateOff.format('DD'),
+                startmonth: +startDateOff.format('MM'),
                 startyear: +startDateOff.format('YYYY'),
-                endday: +endDateOff.format('D'),
-                endmonth: +endDateOff.format('M'),
+                endday: +endDateOff.format('DD'),
+                endmonth: +endDateOff.format('MM'),
                 endyear: +endDateOff.format('YYYY')
             }
             if (!isObjectInArray(ignoreOffDays, ignoreoff)) {
@@ -182,11 +185,11 @@ export default function CalendarGrid(
             if (selectmode === 1) {
                 console.log("Задаем паттерн")
                 let arrp = getPatternDays(weekday, daysArray)
-                setIsRed(prev => prev.concat(arrp).filter((x, i) => isRed.concat(arrp).indexOf(x) === i));
+                setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrp)));
 
                 let pattern = {
                     year: +tempday.format('YYYY'),
-                    month: +tempday.format('M'),
+                    month: +tempday.format('MM'),
                     day: +weekday
                 }
                 console.log(pattern)
@@ -198,7 +201,7 @@ export default function CalendarGrid(
             } else if (selectmode === 2) {
                 console.log("Задаем паттерн")
                 let arryp = getYearPatternDays(weekday, daysArray)
-                setIsRed(prev => prev.concat(arryp).filter((x, i) => isRed.concat(arryp).indexOf(x) === i));
+                setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arryp)));
 
                 let ypattern = {
                     year: +tempday.format('YYYY'),
