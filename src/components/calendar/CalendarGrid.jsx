@@ -82,20 +82,39 @@ export default function CalendarGrid(
     const isObjectInArray = (arr, obj) => {
         return arr.some(item => JSON.stringify(item) === JSON.stringify(obj));
     }
+    const checkObjSinArray = (objsget, oldobjs) => {
+        let uobj = []
+        for (let i = 0; i < objsget.length; i++) {
+            if (!isObjectInArray(oldobjs, objsget[i])) {
+                uobj = [...uobj, objsget[i]]
+            }
+        }
+        return uobj
+    }
 
     useEffect(() => {
+        setIsRed([])
+        setPatternDays([])
+        setIgnoreOnDays([])
+        setIgnoreOffDays([])
         // get data
-        setPatternDays(prevPatternDays => _.uniq(prevPatternDays.concat([...patternDays, {
+        let patget = [{
             year: 2023,
-            month: 2,
+            month: 3,
             day: 3
         }, {
             year: 2023,
             month: 13,
             day: 4
-        }])))
+            }, {
+                year: 2023,
+                month: 2,
+                day: 5
+            }]
+        console.log(checkObjSinArray(patget, patternDays))
+        setPatternDays(patternDays.concat(checkObjSinArray(patget, patternDays)))
 
-        setSuccesful(true)
+        // setSuccesful(true)
     }, [tempday])
 
 
@@ -113,7 +132,7 @@ export default function CalendarGrid(
                 }
             }
         }
-    }, [tempday, successful])
+    }, [tempday])
 
     useEffect(() => {
         if (startDateOn && endDateOn) {

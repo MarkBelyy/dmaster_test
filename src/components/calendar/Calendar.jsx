@@ -37,11 +37,9 @@ export default function Calendar() {
 
   console.log(`До изменений startDay: ${startDay}, tempday: ${tempday}`);
 
-  const prevMonth = () => {
-    setTempday(tempday.subtract(1, 'month').clone())
-  };
-  const nextMonth = () => setTempday(tempday.add(1, 'month').clone());
-  const goToday = () => setTempday(moment());
+  const prevMonth = () => setTempday(tempday.subtract(1, 'month').clone()) //post data
+  const nextMonth = () => setTempday(tempday.add(1, 'month').clone()); //post data
+  const goToday = () => setTempday(moment()); //post data
   const ResetMonth = () => {
     setIsRed([])
     setPatternDays([])
