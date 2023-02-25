@@ -8,7 +8,7 @@ export default function CalendarPattern({ patternDays,
 
     const year = date.year;
     const month = months[date.month - 1];
-    const dayOfWeek = daysOfWeek[date.day];
+    const dayOfWeek = daysOfWeek[date.weekday];
 
     return `${dayOfWeek} ${month} ${year}го `;
   }

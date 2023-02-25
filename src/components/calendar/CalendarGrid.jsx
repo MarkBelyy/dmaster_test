@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import _ from 'lodash';
 import styled from 'styled-components'
-import api from '../../services/api'
+import instance from '../../services/api'
 
 const GridWrapper = styled.div`
     display: grid;
@@ -55,9 +55,8 @@ export default function CalendarGrid(
     const [endDateOn, setEndDateOn] = useState(null);
     const [startDateOff, setStartDateOff] = useState(null);
     const [endDateOff, setEndDateOff] = useState(null);
-
-    const [successful, setSuccesful] = useState(false)
-
+const [patget, setPatget] = useState([]);
+    const [successful, setSuccessful] = useState(false)
 
     const day = startDay.clone()
     const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
@@ -101,47 +100,40 @@ export default function CalendarGrid(
     }
 
     useEffect(() => {
-        setIsRed([])
-        setPatternDays([])
-        setIgnoreOnDays([])
-        setIgnoreOffDays([])
-        // get data
-        let patget = [{
-            year: 2023,
-            month: 3,
-            day: 3
-        }, {
-            year: 2023,
-            month: 13,
-            day: 4
-        }, {
-            year: 2023,
-            month: 2,
-            day: 5
-        }]
-        let ionget = [{
-            startday: 5,
-            startmonth: 2,
-            startyear: 2023,
-            endday: 19,
-            endmonth: 2,
-            endyear: 2023
-        }]
-        let ioffget = [{
-            startday: 3,
-            startmonth: 2,
-            startyear: 2023,
-            endday: 25,
-            endmonth: 2,
-            endyear: 2023
-        }]
-        console.log(checkObjSinArray(patget, patternDays))
-        setPatternDays(patternDays.concat(checkObjSinArray(patget, patternDays)))
-        setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(ionget, ignoreOnDays)))
-        setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(ioffget, ignoreOffDays)))
-        // setSuccesful(true)
-    }, [tempday])
+  if(!successful){
+    setIgnoreOnDays([])
+    setIgnoreOffDays([])
+    // get data
+    const prevmonth = +tempday.format('M') - 1
+    const nextmonth = +tempday.format('M') + 1
+    
+    Promise.all([
+      instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: tempday.format('M') } }),
+      instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: prevmonth } }),
+      instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: nextmonth } })
+    ]).then(responses => {
+      const data = responses.flatMap(response => response.data)
+      setPatget(prevPatget => prevPatget.concat(data))
+      console.log(patget); // выводим данные в консоль
+    }).catch(error => {
+      console.error(error); // выводим ошибку в консоль
+    });
 
+    setSuccessful(true)
+  }
+}, [tempday, successful])
+
+    useEffect(() => {
+        /* if(patget){ */
+        /* setIsRed([]) */if(patget){
+        setPatternDays(patternDays.concat(checkObjSinArray(patget, patternDays)))
+        console.log('паттерны обновлены')
+        }
+        /* setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(ionget, ignoreOnDays)))
+        setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(ioffget, ignoreOffDays))) */
+        // setSuccesful(true)
+        /* } */
+    }, [successful, patget])
 
     useEffect(() => {
 
@@ -149,12 +141,13 @@ export default function CalendarGrid(
 
             for (let i = 0; i < patternDays.length; i++) {
                 if (patternDays[i].month === 13 && patternDays[i].year === +tempday.format('YYYY')) {
-                    let arrpy = getYearPatternDays(patternDays[i].day, daysArray)
+                    let arrpy = getYearPatternDays(patternDays[i].weekday, daysArray)
                     setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrpy)));
                 } else if (patternDays[i].month === +tempday.format('M')) {
-                    let arrp = getPatternDays(patternDays[i].day, daysArray)
+                    let arrp = getPatternDays(patternDays[i].weekday, daysArray)
                     setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrp)));
                 }
+                
             }
         }
         if (ignoreOffDays) {
@@ -173,7 +166,7 @@ export default function CalendarGrid(
         }
         
     }
-    , [tempday])
+    , [patternDays, tempday])
 
 useEffect(() => {
     if (startDateOn && endDateOn) {
@@ -235,21 +228,26 @@ useEffect(() => {
     console.log(ignoreOffDays)
 }, [ignoreOffDays])
 
+useEffect(() => {
+    console.log('patget:')
+    console.log(patget)
+}, [patget])
 
-const OnClickCell2 = (weekday, day) => {
+
+const OnClickCell2 = (weekday_, weekday) => {
     let elems = document.querySelector('.selectignore:checked');
 
     if (document.querySelector('.selectignore:checked')) {
         let selectmode = +elems.value
         if (selectmode === 1) {
             console.log("Задаем паттерн")
-            let arrp = getPatternDays(weekday, daysArray)
+            let arrp = getPatternDays(weekday_, daysArray)
             setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrp)));
 
             let pattern = {
                 year: +tempday.format('YYYY'),
                 month: +tempday.format('MM'),
-                day: +weekday
+                weekday: +weekday_
             }
             console.log(pattern)
             console.log(!isObjectInArray(patternDays, pattern))
@@ -259,13 +257,13 @@ const OnClickCell2 = (weekday, day) => {
 
         } else if (selectmode === 2) {
             console.log("Задаем паттерн")
-            let arryp = getYearPatternDays(weekday, daysArray)
+            let arryp = getYearPatternDays(weekday_, daysArray)
             setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arryp)));
 
             let ypattern = {
                 year: +tempday.format('YYYY'),
                 month: +13,
-                day: +weekday
+                weekday: +weekday_
             }
             console.log(!isObjectInArray(patternDays, ypattern))
             console.log(ypattern)
@@ -276,14 +274,14 @@ const OnClickCell2 = (weekday, day) => {
         } else if (selectmode === 3) {
             console.log("Задаем рабочие")
             if (!startDateOn) {
-                console.log("Первый день1:", day)
-                setStartDateOn(day);
+                console.log("Первый день1:", weekday)
+                setStartDateOn(weekday);
             } else if (startDateOn && !endDateOn) {
-                console.log("Второй день:", day)
-                setEndDateOn(day);
+                console.log("Второй день:", weekday)
+                setEndDateOn(weekday);
             } else {
-                console.log("Первый день2:", day)
-                setStartDateOn(day);
+                console.log("Первый день2:", weekday)
+                setStartDateOn(weekday);
                 setEndDateOn(null);
             }
 
@@ -291,14 +289,14 @@ const OnClickCell2 = (weekday, day) => {
             console.log("Задаем выходные")
 
             if (!startDateOff) {
-                console.log("Первый день1:", day)
-                setStartDateOff(day);
+                console.log("Первый день1:", weekday)
+                setStartDateOff(weekday);
             } else if (startDateOff && !endDateOff) {
-                console.log("Второй день:", day)
-                setEndDateOff(day);
+                console.log("Второй день:", weekday)
+                setEndDateOff(weekday);
             } else {
-                console.log("Первый день2:", day)
-                setStartDateOff(day);
+                console.log("Первый день2:", weekday)
+                setStartDateOff(weekday);
                 setEndDateOff(null);
             }
         }
