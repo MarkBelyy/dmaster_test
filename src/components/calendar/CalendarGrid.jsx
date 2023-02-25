@@ -68,6 +68,18 @@ const [patget, setPatget] = useState([]);
 
         return arr.map(x => x.format('DDMMYYYY'))
     }
+    const getNextPatternDays = (dayweek, daysArray) => {
+        let arr = daysArray.filter(item => item.day() === dayweek)
+        arr = arr.filter(item => +item.format('M') === +daysArray[20].format('M')+1)
+
+        return arr.map(x => x.format('DDMMYYYY'))
+    }
+    const getPrevPatternDays = (dayweek, daysArray) => {
+        let arr = daysArray.filter(item => item.day() === dayweek)
+        arr = arr.filter(item => +item.format('M') === +daysArray[20].format('M')-1)
+
+        return arr.map(x => x.format('DDMMYYYY'))
+    }
     const getYearPatternDays = (dayweek, daysArray) => {
         let arr = daysArray.filter(item => item.day() === dayweek)
         return arr.map(x => x.format('DDMMYYYY'))
@@ -145,6 +157,12 @@ const [patget, setPatget] = useState([]);
                     setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrpy)));
                 } else if (patternDays[i].month === +tempday.format('M')) {
                     let arrp = getPatternDays(patternDays[i].weekday, daysArray)
+                    setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrp)));
+                } else if (patternDays[i].month === +tempday.format('M')+1) {
+                    let arrp = getNextPatternDays(patternDays[i].weekday, daysArray)
+                    setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrp)));
+                } else if (patternDays[i].month === +tempday.format('M')-1) {
+                    let arrp = getPrevPatternDays(patternDays[i].weekday, daysArray)
                     setIsRed(prevIsRed => _.uniq(prevIsRed.concat(arrp)));
                 }
                 
