@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "./token.service";
 
 const instance = axios.create({
-    baseURL: "https://01d2-93-92-200-175.eu.ngrok.io",
+    baseURL: "https://3fdf-138-199-19-145.eu.ngrok.io",
     headers: {
         "Content-Type": "application/json",
     },
