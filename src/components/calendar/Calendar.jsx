@@ -55,7 +55,6 @@ export default function Calendar() {
     //get data
   }
 
-
   console.log(`До изменений startDay: ${startDay}, tempday: ${tempday}`);
 
   console.log(`startDay: ${startDay}, tempday: ${tempday}`);
