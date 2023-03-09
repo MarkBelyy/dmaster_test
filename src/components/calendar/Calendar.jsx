@@ -14,7 +14,6 @@ import {
   getPrevPatternDays,
   getIgonoreDays
 } from './CalendarFunc'
-import { CalendarFetch } from './CalendarFetch'
 import instance from '../../services/api'
 const CalendarBlock = styled.div`
     display: flex;
@@ -56,36 +55,12 @@ export default function Calendar() {
 
   const prevMonth = () => {
     const prevprevmonth = +tempday.format('M') - 2
-    instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: prevprevmonth } }).then(responses => {
-      const data = responses.flatMap(response => response.data)
-      setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
-    })
-    instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: prevprevmonth } }).then(responses => {
-      const data = responses.flatMap(response => response.data)
-      setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(data, ignoreOnDays)))
-    })
-
-    instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: prevprevmonth } }).then(responses => {
-      const data = responses.flatMap(response => response.data)
-      setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(data, ignoreOffDays)))
-    })
+    getPrevOrNext(prevprevmonth)
     setTempday(tempday.subtract(1, 'month').clone())
   }
   const nextMonth = () => {
     const nextnextMonth = +tempday.format('M') + 2
-    instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: nextnextMonth } }).then(responses => {
-      const data = responses.flatMap(response => response.data)
-      setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
-    })
-    instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: nextnextMonth } }).then(responses => {
-      const data = responses.flatMap(response => response.data)
-      setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(data, ignoreOnDays)))
-    })
-
-    instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: nextnextMonth } }).then(responses => {
-      const data = responses.flatMap(response => response.data)
-      setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(data, ignoreOffDays)))
-    })
+    getPrevOrNext(nextnextMonth)
     setTempday(tempday.add(1, 'month').clone())
   }
   const goToday = () => {
@@ -295,6 +270,21 @@ export default function Calendar() {
   //   console.log(selectedDay)
   // }, [selectedDay])
 
+  const getPrevOrNext = (month) => {
+    instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
+        const data = responses.flatMap(response => response.data)
+        setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
+      })
+      instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
+        const data = responses.flatMap(response => response.data)
+        setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(data, ignoreOnDays)))
+      })
+  
+      instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
+        const data = responses.flatMap(response => response.data)
+        setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(data, ignoreOffDays)))
+      })
+  }
 
   const OnClickCell = (weekday_, weekday) => {
     let elems = document.querySelector('.selectignore:checked');
