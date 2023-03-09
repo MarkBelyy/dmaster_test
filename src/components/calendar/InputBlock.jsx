@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-
+import {
+    sendData
+  } from './CalendarFetch'
 const InputDiv = styled.div`
 padding-top: 10px;
 padding-bottom: 10px;
@@ -16,7 +18,7 @@ const SelectDiv = styled.div`
 `
 
 
-export default function InputBlock({ ResetMonth }) {
+export default function InputBlock({ ResetMonth, patternDaysPost, ignoreOnDaysPost, ignoreOffDaysPost}) {
     const [lastChecked, setLastChecked] = useState(null);
 
     function uncheckRadioButtons(e) {
@@ -72,7 +74,7 @@ export default function InputBlock({ ResetMonth }) {
                     onClick={uncheckRadioButtons}
                 />
             </SelectDiv>
-            <button>Применить</button>
+            <button onClick={() => sendData(patternDaysPost, ignoreOnDaysPost, ignoreOffDaysPost)}>Применить</button>
             <button
                 onClick={ResetMonth}
             >Сброс</button>

@@ -12,12 +12,12 @@ instance.interceptors.request.use(
     (config) => {
         const token = TokenService.getLocalAccessToken();
         if (token) {
-            console.log(`token: ${token}`);
+            // console.log(`token: ${token}`);
             config.headers["Authorization"] = token;  // for Spring Boot back-end
             // config.headers["x-access-token"] = token; // for Node.js Express back-end
             if (config.method === 'get' && config.params) {
                 config.url += `?${Object.keys(config.params).map(key => `${key}=${config.params[key]}`).join('&')}`;
-                console.log(config.url)
+                // console.log(config.url)
               }
         }
         return config;
