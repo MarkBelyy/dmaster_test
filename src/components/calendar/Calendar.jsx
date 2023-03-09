@@ -99,7 +99,8 @@ export default function Calendar() {
         instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: nextmonth } })
       ]).then(responses => {
         const data = responses.flatMap(response => response.data)
-        setPatGet(prevPatget => prevPatget.concat(data))
+        setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
+        // setPatGet(prevPatget => prevPatget.concat(data))
         console.log(patGet); // выводим данные в консоль
       }).catch(error => {
         console.error(error); // выводим ошибку в консоль
@@ -111,7 +112,8 @@ export default function Calendar() {
         instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: nextmonth } })
       ]).then(responses => {
         const data = responses.flatMap(response => response.data)
-        setExepOnGet(prevExepOnGet => prevExepOnGet.concat(data))
+        setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(data, ignoreOnDays)))
+        // setExepOnGet(prevExepOnGet => prevExepOnGet.concat(data))
       }).catch(error => {
         console.error(error); // выводим ошибку в консоль
       });
@@ -122,7 +124,8 @@ export default function Calendar() {
         instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: nextmonth } })
       ]).then(responses => {
         const data = responses.flatMap(response => response.data)
-        setExepOffGet(prevExepOffGet => prevExepOffGet.concat(data))
+        setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(data, ignoreOffDays)))
+        // setExepOffGet(prevExepOffGet => prevExepOffGet.concat(data))
       }).catch(error => {
         console.error(error); // выводим ошибку в консоль
       });
@@ -133,28 +136,28 @@ export default function Calendar() {
 
 
 
-  useEffect(() => {
-    if (patGet) {
-      setPatternDays(patternDays.concat(checkObjSinArray(patGet, patternDays)))
-      console.log('паттерны обновлены')
-    }
+  // useEffect(() => {
+  //   if (patGet) {
+  //     setPatternDays(patternDays.concat(checkObjSinArray(patGet, patternDays)))
+  //     console.log('паттерны обновлены')
+  //   }
 
-  }, [successful, patGet])
+  // }, [successful, patGet])
 
-  useEffect(() => {
-    if (exepOnGet) {
-      setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(exepOnGet, ignoreOnDays)))
-      console.log('исчключения обновлены (on)')
-    }
-  }, [successful /*successful надо убрать, а лучшк доделать загрузку без лишних массивов*/,
-    exepOnGet])
+  // useEffect(() => {
+  //   if (exepOnGet) {
+  //     setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(exepOnGet, ignoreOnDays)))
+  //     console.log('исчключения обновлены (on)')
+  //   }
+  // }, [successful /*successful надо убрать, а лучшк доделать загрузку без лишних массивов*/,
+  //   exepOnGet])
 
-  useEffect(() => {
-    if (exepOffGet) {
-      setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(exepOffGet, ignoreOffDays)))
-      console.log('исчключения обновлены (off)')
-    }
-  }, [successful /*successful надо убрать*/, exepOffGet])
+  // useEffect(() => {
+  //   if (exepOffGet) {
+  //     setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(exepOffGet, ignoreOffDays)))
+  //     console.log('исчключения обновлены (off)')
+  //   }
+  // }, [successful /*successful надо убрать*/, exepOffGet])
 
   useEffect(() => {
     if (patternDays) {
@@ -174,7 +177,7 @@ export default function Calendar() {
         }
       }
     }
-  }, [patternDays, tempday])
+  }, [patternDays, tempday/*А нужен ли здесь темпдей и паттерн дэйс вместе???*/])
 
   useEffect(() => {
     if (ignoreOnDays) {
