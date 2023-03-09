@@ -38,7 +38,6 @@ export default function Calendar() {
   const [exepOffGet, setExepOffGet] = useState([]);
   const [successful, setSuccessful] = useState(false)
   const [selectedDay, setSelectedDay] = useState(false)
-  const [tempday, setTempday] = useState(moment());
 
   moment.updateLocale("ru", {
     week: {
@@ -47,13 +46,14 @@ export default function Calendar() {
     }
   });
 
-  
+  const [tempday, setTempday] = useState(moment());
+
   useEffect(() => {
     setTempday(moment())
   }, [])
 
-
   const startDay = tempday.clone().startOf('month').startOf('week').subtract(1, 'd')
+
   const prevMonth = () => {
     const prevprevmonth = +tempday.format('M') - 2
     instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: prevprevmonth } }).then(responses => {
@@ -164,15 +164,15 @@ export default function Calendar() {
       console.log('паттерны обновлены')
     }
 
-  }, [successful , patGet])
+  }, [successful, patGet])
 
   useEffect(() => {
     if (exepOnGet) {
       setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(exepOnGet, ignoreOnDays)))
       console.log('исчключения обновлены (on)')
     }
-  }, [successful /*successful надо убрать, а лучшк доделать загрузку без лишних массивов*/, 
-  exepOnGet])
+  }, [successful /*successful надо убрать, а лучшк доделать загрузку без лишних массивов*/,
+    exepOnGet])
 
   useEffect(() => {
     if (exepOffGet) {
@@ -389,7 +389,7 @@ export default function Calendar() {
           ResetMonth={ResetMonth}
           patternDaysPost={patternDaysPost}
           ignoreOnDaysPost={ignoreOnDaysPost}
-          ignoreOffDaysPost={ignoreOffDaysPost} 
+          ignoreOffDaysPost={ignoreOffDaysPost}
         />
       </div>
       <CalendarPattern
