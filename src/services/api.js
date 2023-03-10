@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "./token.service";
 
 const instance = axios.create({
-    baseURL: "https://3fdf-138-199-19-145.eu.ngrok.io",
+    baseURL: "http://192.168.0.29:9010",
     headers: {
         "Content-Type": "application/json",
     },
@@ -18,7 +18,7 @@ instance.interceptors.request.use(
             if (config.method === 'get' && config.params) {
                 config.url += `?${Object.keys(config.params).map(key => `${key}=${config.params[key]}`).join('&')}`;
                 // console.log(config.url)
-              }
+            }
         }
         return config;
     },

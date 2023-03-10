@@ -54,9 +54,9 @@ export const checkObjSinArray = (objsget, oldobjs) => {
 };
 
 export const parseDate = (dateObj) => {
-  const startDate = moment(`${dateObj.startyear}-${dateObj.startmonth}-${dateObj.startday}`, "YYYY-MM-DD");
-  const endDate = moment(`${dateObj.endyear}-${dateObj.endmonth}-${dateObj.endday}`, "YYYY-MM-DD");
-  console.log('startdata', startDate.format('DD.MM.YYYY'));
-  console.log('enddata', endDate.format('DD.MM.YYYY'));
+  const startDate = moment(`${dateObj.startY}-${dateObj.startM}-${dateObj.startD}`, "YYYY-MM-DD");
+  const endDate = moment(`${dateObj.finishY}-${dateObj.finishM}-${dateObj.finishD}`, "YYYY-MM-DD");
+  console.log('startDate', startDate.format('DD.MM.YYYY'));
+  console.log('startDate', endDate.format('DD.MM.YYYY'));
   return [startDate, endDate];
 };

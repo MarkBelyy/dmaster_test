@@ -25,7 +25,7 @@ export default function Calendar() {
   const [ignoreOnDays, setIgnoreOnDays] = useState([])
   const [ignoreOffDays, setIgnoreOffDays] = useState([])
   const [patternDays, setPatternDays] = useState([])
-  
+
 
   const ignoreOnDaysPost = useRef([]);
   const ignoreOffDaysPost = useRef([]);
@@ -38,7 +38,7 @@ export default function Calendar() {
   // const [patGet, setPatGet] = useState([]);
   // const [exepOnGet, setExepOnGet] = useState([]);
   // const [exepOffGet, setExepOffGet] = useState([]);
-  
+
   const [successful, setSuccessful] = useState(false)
   const [selectedDay, setSelectedDay] = useState(false)
 
@@ -84,16 +84,9 @@ export default function Calendar() {
     setSuccessful(false)
   }
 
-  console.log(`До изменений startDay: ${startDay}, tempday: ${tempday}`);
-  console.log(`startDay: ${startDay}, tempday: ${tempday}`);
-
-  
-
   useEffect(() => {
     if (!successful) {
       //начиная от сюда вынести все в функцию
-      // setIgnoreOnDays([])
-      // setIgnoreOffDays([])
       const prevmonth = +tempday.format('M') - 1
       const nextmonth = +tempday.format('M') + 1
 
@@ -102,9 +95,11 @@ export default function Calendar() {
         instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: prevmonth } }),
         instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: nextmonth } })
       ]).then(responses => {
-        const data = responses.flatMap(response => response.data)
-        setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
-        // setPatGet(prevPatget => prevPatget.concat(data))
+        if (responses.length > 0) {
+          const data = responses.flatMap(response => response.data)
+          setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
+          // setPatGet(prevPatget => prevPatget.concat(data))
+        }
       }).catch(error => {
         console.error(error); // выводим ошибку в консоль
       });
@@ -114,9 +109,11 @@ export default function Calendar() {
         instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: prevmonth } }),
         instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: nextmonth } })
       ]).then(responses => {
-        const data = responses.flatMap(response => response.data)
-        setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(data, ignoreOnDays)))
-        // setExepOnGet(prevExepOnGet => prevExepOnGet.concat(data))
+        if (responses.length > 0) {
+          const data = responses.flatMap(response => response.data)
+          setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(data, ignoreOnDays)))
+          // setExepOnGet(prevExepOnGet => prevExepOnGet.concat(data))
+        }
       }).catch(error => {
         console.error(error); // выводим ошибку в консоль
       });
@@ -126,9 +123,11 @@ export default function Calendar() {
         instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: prevmonth } }),
         instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: nextmonth } })
       ]).then(responses => {
-        const data = responses.flatMap(response => response.data)
-        setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(data, ignoreOffDays)))
-        // setExepOffGet(prevExepOffGet => prevExepOffGet.concat(data))
+        if (responses.length > 0) {
+          const data = responses.flatMap(response => response.data)
+          setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(data, ignoreOffDays)))
+          // setExepOffGet(prevExepOffGet => prevExepOffGet.concat(data))
+        }
       }).catch(error => {
         console.error(error); // выводим ошибку в консоль
       });
@@ -136,31 +135,6 @@ export default function Calendar() {
       setSuccessful(true)
     }
   }, [tempday, successful])
-
-
-
-  // useEffect(() => {
-  //   if (patGet) {
-  //     setPatternDays(patternDays.concat(checkObjSinArray(patGet, patternDays)))
-  //     console.log('паттерны обновлены')
-  //   }
-
-  // }, [successful, patGet])
-
-  // useEffect(() => {
-  //   if (exepOnGet) {
-  //     setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(exepOnGet, ignoreOnDays)))
-  //     console.log('исчключения обновлены (on)')
-  //   }
-  // }, [successful /*successful надо убрать, а лучшк доделать загрузку без лишних массивов*/,
-  //   exepOnGet])
-
-  // useEffect(() => {
-  //   if (exepOffGet) {
-  //     setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(exepOffGet, ignoreOffDays)))
-  //     console.log('исчключения обновлены (off)')
-  //   }
-  // }, [successful /*successful надо убрать*/, exepOffGet])
 
   useEffect(() => {
     if (patternDays) {
@@ -180,18 +154,7 @@ export default function Calendar() {
         }
       }
     }
-  }, [tempday])
-
-  useEffect(() => {
-    if (ignoreOnDays) {
-      for (let i = 0; i < ignoreOnDays.length; i++) {
-        let ionarr = getIgonoreDays(parseDate(ignoreOnDays[i])[0], parseDate(ignoreOnDays[i])[1])
-        console.log('ionarr: ', ionarr)
-        setIsRed(prevIsRed => prevIsRed.filter(item => !ionarr.includes(item)))
-      }
-    }
-
-  }, [ignoreOffDays, tempday])
+  }, [patternDays, tempday])
 
   useEffect(() => {
 
@@ -203,22 +166,32 @@ export default function Calendar() {
       }
     }
   }, [ignoreOffDays, tempday])
+  
+  useEffect(() => {
+    if (ignoreOnDays) {
+      for (let i = 0; i < ignoreOnDays.length; i++) {
+        let ionarr = getIgonoreDays(parseDate(ignoreOnDays[i])[0], parseDate(ignoreOnDays[i])[1])
+        console.log('ionarr: ', ionarr)
+        setIsRed(prevIsRed => prevIsRed.filter(item => !ionarr.includes(item)))
+      }
+    }
+
+  }, [ignoreOnDays, tempday])
 
   useEffect(() => {
     if (startDateOn && endDateOn) {
       let ignoreon = {
-        startday: +startDateOn.format('DD'),
-        startmonth: +startDateOn.format('MM'),
-        startyear: +startDateOn.format('YYYY'),
-        endday: +endDateOn.format('DD'),
-        endmonth: +endDateOn.format('MM'),
-        endyear: +endDateOn.format('YYYY')
+        startD: +startDateOn.format('DD'),
+        startM: +startDateOn.format('MM'),
+        startY: +startDateOn.format('YYYY'),
+        finishD: +endDateOn.format('DD'),
+        finishM: +endDateOn.format('MM'),
+        finishY: +endDateOn.format('YYYY')
       }
-
-      console.log(!isObjectInArray(ignoreOnDays, ignoreon))
+      console.log('ignoreon', ignoreon)
       if (!isObjectInArray(ignoreOnDays, ignoreon)) {
         setIgnoreOnDays([...ignoreOnDays, ignoreon])
-        ignoreOnDaysPost.current=[...ignoreOnDaysPost.current, ignoreon]
+        ignoreOnDaysPost.current = [...ignoreOnDaysPost.current, ignoreon]
       }
       let arron = getIgonoreDays(startDateOn, endDateOn)
       let arr = isRed.filter(item => !arron.includes(item))
@@ -229,16 +202,17 @@ export default function Calendar() {
   useEffect(() => {
     if (startDateOff && endDateOff) {
       let ignoreoff = {
-        startday: +startDateOff.format('DD'),
-        startmonth: +startDateOff.format('MM'),
-        startyear: +startDateOff.format('YYYY'),
-        endday: +endDateOff.format('DD'),
-        endmonth: +endDateOff.format('MM'),
-        endyear: +endDateOff.format('YYYY')
+        startD: +startDateOff.format('DD'),
+        startM: +startDateOff.format('MM'),
+        startY: +startDateOff.format('YYYY'),
+        finishD: +endDateOff.format('DD'),
+        finishM: +endDateOff.format('MM'),
+        finishY: +endDateOff.format('YYYY')
       }
+      console.log('ignoreoff', ignoreoff)
       if (!isObjectInArray(ignoreOffDays, ignoreoff)) {
         setIgnoreOffDays([...ignoreOffDays, ignoreoff])
-        ignoreOffDaysPost.current=[...ignoreOffDaysPost.current, ignoreoff]
+        ignoreOffDaysPost.current = [...ignoreOffDaysPost.current, ignoreoff]
       }
       let arroff = getIgonoreDays(startDateOff, endDateOff)
       let arr = arroff.filter(item => !isRed.includes(item))
@@ -266,11 +240,6 @@ export default function Calendar() {
   //   console.log(ignoreOffDays)
   // }, [ignoreOffDays])
 
-  // // useEffect(() => {
-  // //   console.log('patGet:')
-  // //   console.log(patGet)
-  // // }, [patGet])
-
   // useEffect(() => {
   //   console.log('selectedDay:')
   //   console.log(selectedDay)
@@ -278,18 +247,23 @@ export default function Calendar() {
 
   const getPrevOrNext = (month) => {
     instance.get('/account/pattern', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
-        const data = responses.flatMap(response => response.data)
-        setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
-      })
-      instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
-        const data = responses.flatMap(response => response.data)
-        setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(data, ignoreOnDays)))
-      })
-  
-      instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
-        const data = responses.flatMap(response => response.data)
-        setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(data, ignoreOffDays)))
-      })
+      if (responses.data.length > 0) {
+        setPatternDays(patternDays.concat(checkObjSinArray(responses.data, patternDays)))
+        console.log('паттерны на след месяц загружены и добавлены')
+      }
+    })
+    instance.get('/account/exept/off', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
+      if (responses.data.length > 0) {
+        setIgnoreOffDays(ignoreOffDays.concat(checkObjSinArray(responses.data, ignoreOffDays)))
+        console.log('исключения off на след месяц загружены и добавлены')
+      }
+    })
+    instance.get('/account/exept/on', { params: { year: tempday.format('YYYY'), month: month } }).then(responses => {
+      if (responses.data.length > 0) {
+        setIgnoreOnDays(ignoreOnDays.concat(checkObjSinArray(responses.data, ignoreOnDays)))
+        console.log('исключения on на след месяц загружены и добавлены')
+      }
+    })
   }
 
   const OnClickCell = (weekday_, weekday) => {
@@ -311,7 +285,7 @@ export default function Calendar() {
         console.log(!isObjectInArray(patternDays, pattern))
         if (!isObjectInArray(patternDays, pattern)) {
           setPatternDays([...patternDays, pattern])
-          patternDaysPost.current=[...patternDaysPost.current, pattern]
+          patternDaysPost.current = [...patternDaysPost.current, pattern]
         }
 
       } else if (selectmode === 2) {
@@ -328,7 +302,7 @@ export default function Calendar() {
         console.log(ypattern)
         if (!isObjectInArray(patternDays, ypattern)) {
           setPatternDays([...patternDays, ypattern])
-          patternDaysPost.current=[...patternDaysPost.current, ypattern]
+          patternDaysPost.current = [...patternDaysPost.current, ypattern]
         }
 
       } else if (selectmode === 3) {
