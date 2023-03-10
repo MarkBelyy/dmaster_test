@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import moment from 'moment'
 import styled from 'styled-components'
 import Monitor from './Monitor'
@@ -25,16 +25,20 @@ export default function Calendar() {
   const [ignoreOnDays, setIgnoreOnDays] = useState([])
   const [ignoreOffDays, setIgnoreOffDays] = useState([])
   const [patternDays, setPatternDays] = useState([])
-  const [ignoreOnDaysPost, setIgnoreOnDaysPost] = useState([])
-  const [ignoreOffDaysPost, setIgnoreOffDaysPost] = useState([])
-  const [patternDaysPost, setPatternDaysPost] = useState([])
+  
+
+  const ignoreOnDaysPost = useRef([]);
+  const ignoreOffDaysPost = useRef([]);
+  const patternDaysPost = useRef([]);
+
   const [startDateOn, setStartDateOn] = useState(null);
   const [endDateOn, setEndDateOn] = useState(null);
   const [startDateOff, setStartDateOff] = useState(null);
   const [endDateOff, setEndDateOff] = useState(null);
-  const [patGet, setPatGet] = useState([]);
-  const [exepOnGet, setExepOnGet] = useState([]);
-  const [exepOffGet, setExepOffGet] = useState([]);
+  // const [patGet, setPatGet] = useState([]);
+  // const [exepOnGet, setExepOnGet] = useState([]);
+  // const [exepOffGet, setExepOffGet] = useState([]);
+  
   const [successful, setSuccessful] = useState(false)
   const [selectedDay, setSelectedDay] = useState(false)
 
@@ -47,11 +51,13 @@ export default function Calendar() {
 
   const [tempday, setTempday] = useState(moment());
 
-  useEffect(() => {
-    setTempday(moment())
-  }, [])
+  // useEffect(() => {
+  //   setTempday(moment())
+  // }, [])
 
   const startDay = tempday.clone().startOf('month').startOf('week').subtract(1, 'd')
+  const day = startDay.clone()
+  const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
 
   const prevMonth = () => {
     const prevprevmonth = +tempday.format('M') - 2
@@ -71,19 +77,17 @@ export default function Calendar() {
     setPatternDays([])
     setIgnoreOnDays([])
     setIgnoreOffDays([])
-    setPatternDaysPost([])
-    setIgnoreOnDaysPost([])
-    setIgnoreOffDaysPost([])
+    patternDaysPost.current = 0
+    ignoreOnDaysPost.current = 0
+    ignoreOffDaysPost.current = 0
     console.log("Reset сработал")
     setSuccessful(false)
   }
 
   console.log(`До изменений startDay: ${startDay}, tempday: ${tempday}`);
-
   console.log(`startDay: ${startDay}, tempday: ${tempday}`);
 
-  const day = startDay.clone()
-  const daysArray = [...Array(42)].map(() => day.add(1, 'd').clone())
+  
 
   useEffect(() => {
     if (!successful) {
@@ -101,7 +105,6 @@ export default function Calendar() {
         const data = responses.flatMap(response => response.data)
         setPatternDays(patternDays.concat(checkObjSinArray(data, patternDays)))
         // setPatGet(prevPatget => prevPatget.concat(data))
-        console.log(patGet); // выводим данные в консоль
       }).catch(error => {
         console.error(error); // выводим ошибку в консоль
       });
@@ -177,7 +180,7 @@ export default function Calendar() {
         }
       }
     }
-  }, [patternDays, tempday/*А нужен ли здесь темпдей и паттерн дэйс вместе???*/])
+  }, [tempday])
 
   useEffect(() => {
     if (ignoreOnDays) {
@@ -215,7 +218,7 @@ export default function Calendar() {
       console.log(!isObjectInArray(ignoreOnDays, ignoreon))
       if (!isObjectInArray(ignoreOnDays, ignoreon)) {
         setIgnoreOnDays([...ignoreOnDays, ignoreon])
-        setIgnoreOnDaysPost([...ignoreOnDaysPost, ignoreon])
+        ignoreOnDaysPost.current=[...ignoreOnDaysPost.current, ignoreon]
       }
       let arron = getIgonoreDays(startDateOn, endDateOn)
       let arr = isRed.filter(item => !arron.includes(item))
@@ -235,7 +238,7 @@ export default function Calendar() {
       }
       if (!isObjectInArray(ignoreOffDays, ignoreoff)) {
         setIgnoreOffDays([...ignoreOffDays, ignoreoff])
-        setIgnoreOffDaysPost([...ignoreOffDaysPost, ignoreoff])
+        ignoreOffDaysPost.current=[...ignoreOffDaysPost.current, ignoreoff]
       }
       let arroff = getIgonoreDays(startDateOff, endDateOff)
       let arr = arroff.filter(item => !isRed.includes(item))
@@ -308,7 +311,7 @@ export default function Calendar() {
         console.log(!isObjectInArray(patternDays, pattern))
         if (!isObjectInArray(patternDays, pattern)) {
           setPatternDays([...patternDays, pattern])
-          setPatternDaysPost([...patternDaysPost, pattern])
+          patternDaysPost.current=[...patternDaysPost.current, pattern]
         }
 
       } else if (selectmode === 2) {
@@ -325,7 +328,7 @@ export default function Calendar() {
         console.log(ypattern)
         if (!isObjectInArray(patternDays, ypattern)) {
           setPatternDays([...patternDays, ypattern])
-          setPatternDaysPost([...patternDaysPost, ypattern])
+          patternDaysPost.current=[...patternDaysPost.current, ypattern]
         }
 
       } else if (selectmode === 3) {

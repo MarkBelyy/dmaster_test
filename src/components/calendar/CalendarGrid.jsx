@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import styled from 'styled-components'
-
+import styled, { keyframes } from 'styled-components'
 
 const GridWrapper = styled.div`
     display: grid;
